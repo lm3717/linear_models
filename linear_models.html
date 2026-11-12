@@ -624,6 +624,186 @@ anova(fit_null, fit_alt)</code></pre>
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
+<div id="nesting-data" class="section level2">
+<h2>Nesting Data</h2>
+<p>more complicated model</p>
+<pre class="r"><code>nyc_airbnb |&gt; 
+  lm(price ~ stars * borough + room_type * borough, data = _) |&gt; 
+  broom::tidy() |&gt; 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<colgroup>
+<col width="51%" />
+<col width="11%" />
+<col width="13%" />
+<col width="13%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">90.067</td>
+<td align="right">75.406</td>
+<td align="right">1.194</td>
+<td align="right">0.232</td>
+</tr>
+<tr class="even">
+<td align="left">stars</td>
+<td align="right">4.446</td>
+<td align="right">16.633</td>
+<td align="right">0.267</td>
+<td align="right">0.789</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughBrooklyn</td>
+<td align="right">-20.439</td>
+<td align="right">77.117</td>
+<td align="right">-0.265</td>
+<td align="right">0.791</td>
+</tr>
+<tr class="even">
+<td align="left">boroughManhattan</td>
+<td align="right">5.627</td>
+<td align="right">77.808</td>
+<td align="right">0.072</td>
+<td align="right">0.942</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughQueens</td>
+<td align="right">1.509</td>
+<td align="right">83.501</td>
+<td align="right">0.018</td>
+<td align="right">0.986</td>
+</tr>
+<tr class="even">
+<td align="left">room_typePrivate room</td>
+<td align="right">-52.915</td>
+<td align="right">17.751</td>
+<td align="right">-2.981</td>
+<td align="right">0.003</td>
+</tr>
+<tr class="odd">
+<td align="left">room_typeShared room</td>
+<td align="right">-70.547</td>
+<td align="right">41.551</td>
+<td align="right">-1.698</td>
+<td align="right">0.090</td>
+</tr>
+<tr class="even">
+<td align="left">stars:boroughBrooklyn</td>
+<td align="right">16.525</td>
+<td align="right">16.982</td>
+<td align="right">0.973</td>
+<td align="right">0.331</td>
+</tr>
+<tr class="odd">
+<td align="left">stars:boroughManhattan</td>
+<td align="right">22.664</td>
+<td align="right">17.099</td>
+<td align="right">1.325</td>
+<td align="right">0.185</td>
+</tr>
+<tr class="even">
+<td align="left">stars:boroughQueens</td>
+<td align="right">5.208</td>
+<td align="right">18.272</td>
+<td align="right">0.285</td>
+<td align="right">0.776</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughBrooklyn:room_typePrivate room</td>
+<td align="right">-39.308</td>
+<td align="right">18.024</td>
+<td align="right">-2.181</td>
+<td align="right">0.029</td>
+</tr>
+<tr class="even">
+<td align="left">boroughManhattan:room_typePrivate room</td>
+<td align="right">-71.273</td>
+<td align="right">18.002</td>
+<td align="right">-3.959</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughQueens:room_typePrivate room</td>
+<td align="right">-16.341</td>
+<td align="right">19.020</td>
+<td align="right">-0.859</td>
+<td align="right">0.390</td>
+</tr>
+<tr class="even">
+<td align="left">boroughBrooklyn:room_typeShared room</td>
+<td align="right">-35.292</td>
+<td align="right">42.942</td>
+<td align="right">-0.822</td>
+<td align="right">0.411</td>
+</tr>
+<tr class="odd">
+<td align="left">boroughManhattan:room_typeShared room</td>
+<td align="right">-83.089</td>
+<td align="right">42.451</td>
+<td align="right">-1.957</td>
+<td align="right">0.050</td>
+</tr>
+<tr class="even">
+<td align="left">boroughQueens:room_typeShared room</td>
+<td align="right">-24.427</td>
+<td align="right">44.399</td>
+<td align="right">-0.550</td>
+<td align="right">0.582</td>
+</tr>
+</tbody>
+</table>
+<p>whats happening in Mnahaatna</p>
+<pre class="r"><code>nyc_airbnb |&gt; 
+  filter(borough == &quot;Manhattan&quot;) |&gt; 
+  lm(price ~ stars + room_type, data = _) |&gt; 
+  broom::tidy()</code></pre>
+<pre><code>## # A tibble: 4 × 5
+##   term                  estimate std.error statistic   p.value
+##   &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)               95.7     22.2       4.31 1.62e-  5
+## 2 stars                     27.1      4.59      5.91 3.45e-  9
+## 3 room_typePrivate room   -124.       3.46    -35.8  9.40e-270
+## 4 room_typeShared room    -154.      10.1     -15.3  2.47e- 52</code></pre>
+<div id="we-can-use-iteration" class="section level5">
+<h5>We can use Iteration</h5>
+<pre class="r"><code>airbnb_lm = function(data) {
+  
+  lm(price ~ stars + room_type, data = data)
+  
+}</code></pre>
+<pre class="r"><code>nyc_airbnb |&gt; 
+  nest(datasets = - borough) |&gt; 
+  mutate(
+    fits = map(datasets, airbnb_lm),
+    results = map(fits, broom::tidy)
+  ) |&gt; 
+  select(-datasets, - fits) |&gt; 
+  unnest(results) |&gt; 
+  select(borough, term, estimate) |&gt; 
+  pivot_wider(
+    names_from = term, 
+    values_from = estimate
+  )</code></pre>
+<pre><code>## # A tibble: 4 × 5
+##   borough   `(Intercept)` stars `room_typePrivate room` `room_typeShared room`
+##   &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;                   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1 Bronx              90.1  4.45                   -52.9                  -70.5
+## 2 Queens             91.6  9.65                   -69.3                  -95.0
+## 3 Brooklyn           69.6 21.0                    -92.2                 -106. 
+## 4 Manhattan          95.7 27.1                   -124.                  -154.</code></pre>
+</div>
+</div>
 
 
 
