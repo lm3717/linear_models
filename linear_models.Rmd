@@ -175,5 +175,35 @@ nyc_airbnb |>
   )
 ```
 
+```{r}
+nyc_airbnb |> 
+  nest(datasets = - borough) |> 
+  mutate(
+    fits = map(datasets, \(data) lm(price ~ stars + room_type, data = data)),
+    results = map(fits, broom::tidy)
+  ) |> 
+  select(-datasets, - fits) |> 
+  unnest(results) |> 
+  select(borough, term, estimate) |> 
+  pivot_wider(
+    names_from = term, 
+    values_from = estimate
+  )
+```
 
+```{r}
+nyc_airbnb |> 
+  filter(borough == "Manhattan") |> 
+  nest(datasets = -neighborhood) |> 
+  mutate(
+    fits = map(datasets, \(df) lm(price ~ stars + room_type, data = df)),
+    results = map(fits, broom::tidy)
+  ) |> 
+  select(neighborhood, results) |> 
+  unnest(results) |> 
+  filter(term == "room_typePrivate room") |> 
+  ggplot(aes(x = neighborhood, y = estimate)) +
+  geom_point() +
+  theme(axis.text = element_text(angle = 80, hjust = 1))
+```
 
