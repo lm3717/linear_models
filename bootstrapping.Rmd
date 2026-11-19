@@ -173,17 +173,48 @@ nyc_airbnb |>
 Need to boot strap
 
 ```{r}
-airbnb_botstrap_df = 
-    nyc_airbnb |> 
-    filter(borough == "Manhattan") |> 
-    modelr::bootstrap(n = 1000) |> 
-    mutate(
-      models = map(strap, \(df) lm(price ~ stars + 
-                                     room_type, data = df)),
-      results = map(models, broom::tidy)) |> 
-    select(results) |> 
-    unnest(results) |> 
-    filter(term == "stars") |> 
-    ggplot(aes(x = estimate)) + geom_density()
+airbnb_bootstrap_df = 
+  nyc_airbnb |> 
+  filter(borough == "Manhattan") |> 
+  modelr::bootstrap(n = 1000) |> 
+  mutate(
+    models = map(strap, \(df) lm(price ~ stars +
+                                   room_type, data = df)),
+    results = map(models, broom::tidy)
+  ) 
 ```
+
+```{r}
+airbnb_bootstrap_df |> 
+  select(results) |> 
+  unnest(results) |> 
+  filter(term == "stars") |> 
+  ggplot(aes(x = estimate)) +
+  geom_density()
+```
+
+## Lidar
+
+```{r}
+data("lidar")
+
+lidar |> 
+  ggplot(aes(x = range, y = logratio)) + 
+  geom_point() + 
+    stat_smooth(method = "gam", formula = y ~ s(x))
+```
+
+```{r}
+lidar |> 
+  modelr::bootstrap(n = 250) |> 
+  mutate(
+    models = map(strap, \(df) gam(logratio ~ s(range), data = df)),
+    results = map(models, \(mod) modelr::add_predictions(data = lidar, model = mod))) |> 
+  select(.id, results) |> 
+  unnest(results) |> 
+  ggplot(aes(x = range, y = pred, group = .id)) + 
+  geom_path(color = "blue", alpha = .5) + 
+  geom_point(data = lidar, aes(y = logratio, group = NULL))
+```
+
 
